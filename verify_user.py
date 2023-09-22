@@ -3,6 +3,7 @@ from deepface import DeepFace
 from tkinter import messagebox
 import time
 import csv
+import create_dataset as data
 def capture_image():
     cascPath = "haarcascade_frontalface_default.xml"
     faceCascade = cv2.CascadeClassifier(cascPath)
@@ -47,12 +48,15 @@ def check(name):
     checklist =  DeepFace.find(image, data_path, enforce_detection=False)
     img = cv2.imread(image)
     cv2.imshow("Result", img)
-    if len(checklist)>0:
+    #set threshold >0.5 to check the result
+    threshold = len(checklist)/data.number_of_samples(name)*1.0
+    
+    if threshold > 0.5:
         info = save_log(name)
         messagebox.showinfo("Congrat", info[0]+ " has checked in at "+info[1] )
        
     else:
-       messagebox.showerror("Error", "Please try again")
+       messagebox.showerror("Error", "Is not "+ name+" . Please try again")
        
 def save_log(name):
     named_tuple = time.localtime() # get struct_time
@@ -71,5 +75,5 @@ def save_log(name):
               
 def main_app(name):
     check(name)
-    
-check('tho1')
+ 
+#check('tho1')
