@@ -105,10 +105,15 @@ def read_nameslist():
     except FileNotFoundError:
         print(f"File '{file_path}' not found.")
     #elements = []
-
-# Step 2: Input the element to search for
-    
-
-# Step 3: Search for the element in the list
     return elements
+
+def number_of_samples(name):
+    data_path = 'data'+name
+    if os.path.exists(data_path):
+    # Get the list of files in the folder
+        files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
+    
+    # Count the number of files
+    num_files = len(files)  
+    return num_files 
     
