@@ -11,7 +11,7 @@ simple attendance system using face recognition
    ```sh
    $ pip install -r requirements.txt
    ```
-   Step 2: run program.
+   Step 3: run program.
    run GUI.py file by command.
    ```sh
    $ python GUI.py
@@ -43,8 +43,18 @@ simple attendance system using face recognition
    #threshold > 0,5 -> verified, otherwise -> not verified
    #num_of_files(name) is the number of sample which exists in each person dataset
    ```
-#5. References:
+
+#5. Advantages and Disadvantages
+     ###Advantages:
+   - Can recognize object in weak light environment
+   - When signed up user wear glasses. However, while recognition that person do not wear glass -> can recognize
+     ###Disadvantages
+   - In the first time need to download model file and weights file -> it spends too much time (about 200 seconds) depends on computer
+   - When threshold too low model may have a wrong prediction
+
+#6. References:
    - Deep face: https://github.com/serengil/deepfacev .
    - UI design: https://github.com/joeVenner/FaceRecognition-GUI-APP
+    
    
    
