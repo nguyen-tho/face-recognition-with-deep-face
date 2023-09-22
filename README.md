@@ -45,7 +45,8 @@ simple attendance system using face recognition
    ```
 
 #5. Advantages and Disadvantages
-     ### Advantages:
+
+   ### Advantages
    - Can recognize object in weak light environment
    - When signed up user wear glasses. However, while recognition that person do not wear glass -> can recognize
      ### Disadvantages
