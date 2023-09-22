@@ -27,10 +27,17 @@ simple attendance system using face recognition
    ```sh
    from deepface import Deepface
    checklist =  DeepFace.find(image, data_path, enforce_detection=False)
+   #image is path of image which is captured to verify
+   #data_path is path of that person dataset
    ```
-   if has one or more images fitted, return verified. Otherwise, not verified
-   data_path is path of folder which contain set of images when the user signed up to the system
-   image is path of an image which captured to verify information of the user
+   set threshold to determine how many correct samples are enough to make decision verified or not verified.
+   In this case, set threshold more than 0,5
+   where
+   ```sh
+   threshold = len(checklist)/num_of_files(name)
+   #threshold > 0,5 -> verified, otherwise -> not verified
+   #num_of_files(name) is the number of sample which exists in each person dataset
+   ```
 5. References:
    Deep face: https://github.com/serengil/deepfacev .
    UI design: https://github.com/joeVenner/FaceRecognition-GUI-APP
