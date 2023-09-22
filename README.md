@@ -1,8 +1,12 @@
 # simple-attendance-system
 simple attendance system using face recognition
 
-1. Tutorial
-   Step 1: install pakages by command.
+1. Tutorial:
+   Step 1: download source from github
+   ```sh
+   $ git clone https://github.com/nguyen-tho/simple-attendance-system.git
+   ```
+   Step 2: install pakages by command.
    ```sh
    $ pip install -r requirements.txt
    ```
@@ -16,12 +20,12 @@ simple attendance system using face recognition
    $ python3 GUI.py
    ```
    if you use python 3
-2. Collect data:
+3. Collect data:
    System will take a video about 350 frame, user can make several poses as much as possible to create a variety dataset
 
-3. Capture an image to verify:
+4. Capture an image to verify:
    When user need to check in, system will take a photo automatically for 5s after camera/webcam turned on
-4. Deepface:
+5. Deepface:
    In this project I have just used deepface to verify the identity of a person who sign up his/her information and data has been saved in our database
    Using find method to check an image which is fiited to one or more images in database
    ```sh
@@ -38,7 +42,7 @@ simple attendance system using face recognition
    #threshold > 0,5 -> verified, otherwise -> not verified
    #num_of_files(name) is the number of sample which exists in each person dataset
    ```
-5. References:
+6. References:
    Deep face: https://github.com/serengil/deepfacev .
    UI design: https://github.com/joeVenner/FaceRecognition-GUI-APP
    
