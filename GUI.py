@@ -197,6 +197,7 @@ class PageFour(tk.Frame):
 
     def openwebcam(self):
         v.main_app(self.controller.active_name)
+        self.controller.show_frame("StartPage")
         
     '''
     def gender_age_pred(self):

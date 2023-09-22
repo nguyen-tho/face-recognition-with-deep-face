@@ -51,12 +51,13 @@ def check(name):
     #set threshold >0.5 to check the result
     threshold = len(checklist)/data.number_of_samples(name)*1.0
     
-    if threshold > 0.5:
+    if threshold >= 0.6:
         info = save_log(name)
         messagebox.showinfo("Congrat", info[0]+ " has checked in at "+info[1] )
        
     else:
-       messagebox.showerror("Error", "Is not "+ name+" . Please try again")
+       messagebox.showinfo("Error", "Is not "+ name+" . Please try again")
+    cv2.destroyAllWindows()
        
 def save_log(name):
     named_tuple = time.localtime() # get struct_time

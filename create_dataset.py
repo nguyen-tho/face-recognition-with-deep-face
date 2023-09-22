@@ -108,7 +108,7 @@ def read_nameslist():
     return elements
 
 def number_of_samples(name):
-    data_path = 'data'+name
+    data_path = 'data/'+name
     if os.path.exists(data_path):
     # Get the list of files in the folder
         files = [f for f in os.listdir(data_path) if os.path.isfile(os.path.join(data_path, f))]
