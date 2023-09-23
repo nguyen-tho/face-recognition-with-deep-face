@@ -36,12 +36,13 @@ simple attendance system using face recognition
    #data_path is path of that person dataset
    ```
    - set threshold to determine how many correct samples are enough to make decision verified or not verified.
-   - In this case, set threshold more than 0,5
+   - In this case, set threshold more than 0,6
    where
    ```sh
    threshold = len(checklist)/num_of_files(name)
    #threshold > 0,5 -> verified, otherwise -> not verified
-   #num_of_files(name) is the number of sample which exists in each person dataset
+   #num_of_files(name) is the number of samples which exists in each person dataset
+   #len(checklist) is the number of samples which are predicted is true
    ```
 
 #5. Advantages and Disadvantages
@@ -49,7 +50,7 @@ simple attendance system using face recognition
    - Can recognize object in weak light environment
    - When signed up user wear glasses. However, while recognition that person do not wear glass -> can recognize
    ### Disadvantages
-   - In the first time need to download model file and weights file -> it spends too much time (about 200 seconds) depends on computer
+   - In the first time need to download model file and weights file -> it spends too much time (about 120 seconds) depends on computer
    - When threshold too low model may have a wrong prediction
 
 #6. References:
