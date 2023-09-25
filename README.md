@@ -47,14 +47,15 @@ simple attendance system using face recognition
 
 #5. Advantages and Disadvantages
    ### Advantages
-   - Can recognize object in weak light environment
+   - Can recognize object in weak brigtness environment
    - When signed up user wear glasses. However, while recognition that person do not wear glass -> can recognize
    ### Disadvantages
    - In the first time need to download model file and weights file -> it spends too much time (about 120 seconds) depends on computer
    - When threshold too low model may have a wrong prediction
+   - Cannot detect real-time -> cannot apply to a practical project
 
 #6. References:
-   - Deep face: https://github.com/serengil/deepfacev .
+   - Deep face: https://github.com/serengil/deepface .
    - UI design: https://github.com/joeVenner/FaceRecognition-GUI-APP
     
    
