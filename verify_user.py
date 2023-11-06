@@ -79,4 +79,42 @@ def save_log(name):
 def main_app(name):
     check(name)
  
-check('tho')
+def check_realtime(name):
+    data_path = 'data/' + name
+    cap = cv2.VideoCapture(0)
+    while True:
+        ret, frame = cap.read()
+        faces = DeepFace.extract_faces(frame, detector_backend='ssd',
+                                        enforce_detection=False)
+        region = faces[0]["facial_area"]
+    #print(region)
+        x = region['x']
+        y = region['y']
+        w = region['w']
+        h = region['h']
+        
+        confidence = faces[0]["confidence"]
+        new_img = frame[y:y+h, x:x+w]
+        
+        if confidence > 0.5:
+            code = 0
+            verified_img =  DeepFace.verify(frame, data_path+f'/{name}_{code}.jpg', enforce_detection=False)
+            verified = verified_img["verified"]
+            if verified:
+                text = (name+f'  {confidence:.4f}').upper()
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
+            else: 
+                text = "UNVERIFIED"
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
+        cv2.imshow("Real-time Face Detection", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'): #press 'q' to exit
+            break
+# Release the camera
+    cap.release()
+    cv2.destroyAllWindows()
+        
+check_realtime('tho')

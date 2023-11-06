@@ -4,44 +4,44 @@ import os
 from deepface import DeepFace
 
 def start_capture(name):
-        model = DeepFace.build_model("VGG-Face")
-        path = "./data/" + name
-        try:
-            os.makedirs(path)
-        except:
-            print('Directory Already Created')
+    model = DeepFace.build_model("VGG-Face")
+    path = "./data/" + name
+    try:
+        os.makedirs(path)
+    except:
+        print('Directory Already Created')
 # Create a video capture object for your camera (usually 0 for built-in cameras)
-        cap = cv2.VideoCapture(0)
-        num_of_images = 0
-        while True:
+    cap = cv2.VideoCapture(0)
+    num_of_images = 0
+    while True:
     # Capture a frame from the camera
-            ret, frame = cap.read()
+        ret, frame = cap.read()
 
      #Perform face detection on the frame
-            detected_faces = DeepFace.extract_faces(frame, detector_backend='ssd',
+        detected_faces = DeepFace.extract_faces(frame, detector_backend='ssd',
                                         enforce_detection=False)
 
-            region = detected_faces[0]["facial_area"]
+        region = detected_faces[0]["facial_area"]
     #print(region)
-            x = region['x']
-            y = region['y']
-            w = region['w']
-            h = region['h']
-            print(x, y, w, h)
-            cv2.rectangle(frame, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
-            cv2.imshow("Real-time Face Detection", frame)
-            new_img = frame[y:y+h, x:x+w]
-            try :
-                cv2.imwrite(str(path+"/"+name+"_"+str(num_of_images)+".jpg"), new_img)
-                num_of_images += 1
-            except :
+        x = region['x']
+        y = region['y']
+        w = region['w']
+        h = region['h']
+        print(x, y, w, h)
+        cv2.rectangle(frame, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
+        cv2.imshow("Real-time Face Detection", frame)
+        new_img = frame[y:y+h, x:x+w]
+        try :
+            cv2.imwrite(str(path+"/"+name+"_"+str(num_of_images)+".jpg"), new_img)
+            num_of_images += 1
+        except :
 
-                pass
-            key = cv2.waitKey(1) & 0xFF
-            if key == ord("q") or key == 27 or num_of_images > 350: #take 300 frames
-                break
-        cv2.destroyAllWindows()
-        return num_of_images
+            pass
+        key = cv2.waitKey(1) & 0xFF
+        if key == ord("q") or key == 27 or num_of_images > 350: #take 300 frames
+            break
+    cv2.destroyAllWindows()
+    return num_of_images
 #take frames by extract a video 
 def take_video(name, video):
     path = "./data/" + name
