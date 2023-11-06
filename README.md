@@ -28,23 +28,15 @@ simple attendance system using face recognition
    - When user need to check in, system will take a photo automatically for 5s after camera/webcam turned on
 #4. Deepface:
    - In this project I have just used deepface to verify the identity of a person who sign up his/her information and data has been saved in our database
-   - Using find method to check an image which is fiited to one or more images in database
+   - Using verify method to check an image which is similar with one random image in his/her dataset images in database
    ```sh
    from deepface import Deepface
-   checklist =  DeepFace.find(image, data_path, enforce_detection=False)
+   checklist =  DeepFace.verify(image, image_in_dataset, enforce_detection=False)
    #image is path of image which is captured to verify
    #data_path is path of that person dataset
    ```
-   - set threshold to determine how many correct samples are enough to make decision verified or not verified.
-   - In this case, set threshold more than 0,6
-   where
-   ```sh
-   threshold = len(checklist)/num_of_files(name)
-   #threshold > 0,5 -> verified, otherwise -> not verified
-   #num_of_files(name) is the number of samples which exists in each person dataset
-   #len(checklist) is the number of samples which are predicted is true
-   ```
-
+   - if verified value is True -> save log
+   - if not -> send alert "try again"
 #5. Advantages and Disadvantages
    ### Advantages
    - Can recognize object in weak brigtness environment
