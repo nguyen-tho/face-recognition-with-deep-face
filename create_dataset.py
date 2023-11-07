@@ -42,7 +42,8 @@ def start_capture(name):
         if key == ord("q") or key == 27 or num_of_images > 350: #take 300 frames
             break
     cv2.destroyAllWindows()
-    return num_of_images
+    cap.release()
+    
 #take frames by extract a video 
 def take_video(name, video):
     path = "./data/" + name
@@ -83,7 +84,7 @@ def take_video(name, video):
         if key == ord("q") or key == 27 or num_of_images > 500: #take 500 frames
             break
         cv2.destroyAllWindows()
-        return num_of_images
+        
 
 def adjust_brightness(frame, alpha, beta):
     # Apply brightness adjustment to a single frame

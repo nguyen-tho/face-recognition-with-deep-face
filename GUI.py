@@ -162,13 +162,13 @@ class PageThree(tk.Frame):
         self.numimglabel.config(text=str("Captured Images = 0 "))
         messagebox.showinfo("INSTRUCTIONS", "We will Capture 300 pic of your Face.")
         x = data.start_capture(self.controller.active_name)
-        self.controller.num_of_images = x
-        self.numimglabel.config(text=str("Number of images captured = "+str(x)))
+        self.controller.num_of_images = data.number_of_samples(self.controller.active_name)
+        self.numimglabel.config(text=str(f"Number of images captured = {data.number_of_samples(self.controller.active_name)}"))
         data.get_nameslist()
 
     def trainmodel(self):
         if self.controller.num_of_images < 350:
-            messagebox.showerror("ERROR", "Not enough Data, Capture at least 300 images!")
+            messagebox.showerror("ERROR", "Not enough Data, Capture at least 350 images!")
             return
         else:
             messagebox.showinfo('Complete','Your data has been added to database')

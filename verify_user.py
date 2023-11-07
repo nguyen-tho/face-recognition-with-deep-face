@@ -135,4 +135,4 @@ def verified_image(compare, name):
     verified = verified_img["verified"]
     return verified
 
-check_attendance('tho')
+#check_attendance('tho')
