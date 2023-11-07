@@ -37,6 +37,7 @@ simple attendance system using face recognition
    ```
    - if verified value is True -> save log
    - if not -> send alert "try again"
+     
 #5. Advantages and Disadvantages
    ### Advantages
    - Can recognize object in weak brigtness environment
@@ -49,6 +50,7 @@ simple attendance system using face recognition
 #6. References:
    - Deep face: https://github.com/serengil/deepface .
    - UI design: https://github.com/joeVenner/FaceRecognition-GUI-APP
+     
 #7. New update:
    - Solve the problem "cannot detect realtime" by compare current frame from camera and verify it
    - Verify current frame with a random image in user's dataset
