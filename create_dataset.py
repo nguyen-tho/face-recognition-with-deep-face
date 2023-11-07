@@ -2,6 +2,7 @@
 import cv2
 import os
 from deepface import DeepFace
+import random
 
 def start_capture(name):
     model = DeepFace.build_model("VGG-Face")
@@ -125,5 +126,9 @@ def number_of_samples(name):
     num_jpg_files = len(jpg_files)
     return num_jpg_files 
 
+def random_code(random_range):
+    """generate a random integer between given range"""
+    random_number = random.randint(0, random_range)
+    return random_number
 #print('Num of samples: '+ str(number_of_samples('tho')))
 #start_capture('tho')
