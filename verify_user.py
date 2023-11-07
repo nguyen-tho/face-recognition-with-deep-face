@@ -5,6 +5,9 @@ from tkinter import messagebox
 import time
 import csv
 import create_dataset as data
+import os
+import re
+import pandas as pd 
 
 def capture_image():
     start_time = time.time()
@@ -135,4 +138,51 @@ def verified_image(compare, name):
     verified = verified_img["verified"]
     return verified
 
-#check_attendance('tho')
+def check_identity():
+    """find user in database"""
+    data_path = 'image_data'
+    cap = cv2.VideoCapture(0)
+    while True:
+        ret, frame = cap.read()
+        faces = DeepFace.extract_faces(frame, detector_backend='ssd',
+                                        enforce_detection=False)
+        region = faces[0]["facial_area"]
+    #print(region)
+        x = region['x']
+        y = region['y']
+        w = region['w']
+        h = region['h']
+        
+        confidence = faces[0]["confidence"]
+        if confidence > 0.5:
+            verified_name = find_user(frame, 'image_data')
+            if verified_name != "":
+                text = (verified_name+f'  {confidence:.4f}').upper()
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
+            else: 
+                text = "UNVERIFIED"
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
+        cv2.imshow("Real-time Face Detection", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'): #press 'q' to exit
+            break
+# Release the camera
+    cap.release()
+    cv2.destroyAllWindows()
+        
+def find_user(image, data_path):
+    name = ''
+    data = DeepFace.find(image, data_path , enforce_detection=False, model_name='Facenet512')
+    input_string = str(data[0]["identity"])
+    match = re.search(r'image_data/(\w+).jpg', input_string)
+
+    if match:
+        name = match.group(1)
+    
+    # Create the formula string based on the extracted 'name'
+    return name
+    
+check_identity()    
