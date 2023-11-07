@@ -5,6 +5,7 @@ from tkinter import messagebox
 import time
 import csv
 import create_dataset as data
+
 def capture_image():
     start_time = time.time()
     file_name = 'captured_image.jpg'
@@ -41,14 +42,18 @@ def capture_image():
     cv2.destroyAllWindows()
     return file_name
 
-def check(name):
-    data_path = 'data/' + name
+def check_attendance(name):
+    """_summary_
+
+    Args:
+        name (_type_): _description_
+    """
+    
     image = capture_image()
-    code = 0
-    verified_img =  DeepFace.verify(image, data_path+f'/{name}_{code}.jpg', enforce_detection=False)
+    
     img = cv2.imread(image)
     cv2.imshow("Result", img)
-    verified = verified_img["verified"]
+    verified =verified_image(image, name)
     #set threshold >0.5 to check the result
     #threshold = len(checklist)/data.number_of_samples(name)
 
@@ -77,7 +82,7 @@ def save_log(name):
     return log_data
               
 def main_app(name):
-    check(name)
+    check_attendance(name)
  
 def check_realtime(name):
     data_path = 'data/' + name
@@ -94,12 +99,9 @@ def check_realtime(name):
         h = region['h']
         
         confidence = faces[0]["confidence"]
-        new_img = frame[y:y+h, x:x+w]
-        
+        #new_img = frame[y:y+h, x:x+w]
         if confidence > 0.5:
-            code = 0
-            verified_img =  DeepFace.verify(frame, data_path+f'/{name}_{code}.jpg', enforce_detection=False)
-            verified = verified_img["verified"]
+            verified = verified_image(frame, name)
             if verified:
                 text = (name+f'  {confidence:.4f}').upper()
                 font = cv2.FONT_HERSHEY_PLAIN
@@ -116,5 +118,21 @@ def check_realtime(name):
 # Release the camera
     cap.release()
     cv2.destroyAllWindows()
+
+def verified_image(compare, name):
+    """_summary_
+
+    Args:
+        compare (Any): an image take by webcam, camera
+        name (str): username who was signed up to the system and had image data folder
         
-check_realtime('tho')
+        Returns: status of method DeepFace.verify (boolean)
+    """
+    # code (integer): the number of file name such as tho_30.jpg, code is 30
+    code = data.random_code(data.number_of_samples(name)) #generate random code based on number of image in user data
+    data_path = f"data/{name}/"
+    verified_img =  DeepFace.verify(compare, data_path+f'{name}_{code}.jpg', enforce_detection=False)
+    verified = verified_img["verified"]
+    return verified
+
+check_attendance('tho')
