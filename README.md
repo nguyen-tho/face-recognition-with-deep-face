@@ -31,9 +31,9 @@ simple attendance system using face recognition
    - Using verify method to check an image which is similar with one random image in his/her dataset images in database
    ```sh
    from deepface import Deepface
-   checklist =  DeepFace.verify(image, image_in_dataset, enforce_detection=False)
+   verified_img =  DeepFace.verify(image, image_in_dataset, enforce_detection=False)
    #image is path of image which is captured to verify
-   #data_path is path of that person dataset
+   #image_in_dataset is path of image which is in user's dataset
    ```
    - if verified value is True -> save log
    - if not -> send alert "try again"
