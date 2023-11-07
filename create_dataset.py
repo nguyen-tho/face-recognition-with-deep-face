@@ -4,7 +4,7 @@ import os
 from deepface import DeepFace
 import random
 
-def start_capture(name):
+def create_dataset(name):
     model = DeepFace.build_model("VGG-Face")
     path = "./data/" + name
     try:
