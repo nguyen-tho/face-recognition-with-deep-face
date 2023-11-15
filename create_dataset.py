@@ -118,10 +118,8 @@ def number_of_samples(name):
     data_path = 'data/'+name
     if os.path.exists(data_path):
     # List all files in the directory
-        all_files = os.listdir(data_path)
-    
     # Use a list comprehension to filter for .jpg files
-        jpg_files = [file for file in all_files if file.endswith('.jpg')]
+        jpg_files = find_jpg_files(data_path)
     
     # Count the number of .jpg files
     num_jpg_files = len(jpg_files)
@@ -129,11 +127,8 @@ def number_of_samples(name):
 
 def get_random_jpg_file(folder_path):
     # Get a list of all files in the folder
-    all_files = os.listdir(folder_path)
-
     # Filter only .jpg files
-    jpg_files = [file for file in all_files if file.lower().endswith('.jpg')]
-
+    jpg_files = find_jpg_files(folder_path)
     # Check if there are any .jpg files in the folder
     if not jpg_files:
         print("No .jpg files found in the folder.")
@@ -148,3 +143,6 @@ def get_random_jpg_file(folder_path):
 def find_jpg_files(folder_path):
     jpg_files = [file for file in os.listdir(folder_path) if file.lower().endswith('.jpg')]
     return jpg_files
+
+def extract_subfolder(file_path):
+    return os.path.basename(os.path.dirname(file_path))
