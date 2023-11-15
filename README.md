@@ -21,6 +21,7 @@ simple attendance system using face recognition
    $ python3 GUI.py
    ```
    if you use python 3
+   
 #2. Collect data:
    - System will take a video about 350 frame, user can make several poses as much as possible to create a variety dataset
 
