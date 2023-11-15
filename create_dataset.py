@@ -129,7 +129,11 @@ def number_of_samples(name):
 
 def random_code(random_range):
     """generate a random integer between given range"""
-    random_number = random.randint(0, random_range)
+    random_number = random.randint(0, random_range-1)
     return random_number
 #print('Num of samples: '+ str(number_of_samples('tho')))
 #start_capture('tho')
+
+def find_jpg_files(folder_path):
+    jpg_files = [file for file in os.listdir(folder_path) if file.lower().endswith('.jpg')]
+    return jpg_files
