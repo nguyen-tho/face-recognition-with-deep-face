@@ -127,12 +127,23 @@ def number_of_samples(name):
     num_jpg_files = len(jpg_files)
     return num_jpg_files 
 
-def random_code(random_range):
-    """generate a random integer between given range"""
-    random_number = random.randint(0, random_range-1)
-    return random_number
-#print('Num of samples: '+ str(number_of_samples('tho')))
-#start_capture('tho')
+def get_random_jpg_file(folder_path):
+    # Get a list of all files in the folder
+    all_files = os.listdir(folder_path)
+
+    # Filter only .jpg files
+    jpg_files = [file for file in all_files if file.lower().endswith('.jpg')]
+
+    # Check if there are any .jpg files in the folder
+    if not jpg_files:
+        print("No .jpg files found in the folder.")
+        return None
+
+    # Choose a random .jpg file
+    random_jpg_file = random.choice(jpg_files)
+
+    # Return the full path of the random .jpg file
+    return os.path.join(folder_path, random_jpg_file)
 
 def find_jpg_files(folder_path):
     jpg_files = [file for file in os.listdir(folder_path) if file.lower().endswith('.jpg')]

@@ -140,10 +140,10 @@ def verified_image(compare, name):
         
         Returns: status of method DeepFace.verify (boolean)
     """
-    # code (integer): the number of file name such as tho_30.jpg, code is 30
-    code = data.random_code(data.number_of_samples(name)) #generate random code based on number of image in user data
     data_path = f"data/{name}/"
-    verified_img =  DeepFace.verify(compare, data_path+f'{name}_{code}.jpg', enforce_detection=False, model_name='Facenet512')
+    target = data.get_random_jpg_file(data_path) #get random target image file in user's dataset
+    
+    verified_img =  DeepFace.verify(compare, target, enforce_detection=False, model_name='Facenet512')
     verified = verified_img["verified"]
     return verified
 
@@ -195,4 +195,5 @@ def find_user(image, data_path):
     return name
     
 #check_identity()  
-check_attendance('tho')
+#check_attendance('tho')
+check_realtime('tho')
