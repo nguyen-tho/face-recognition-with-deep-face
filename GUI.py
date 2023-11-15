@@ -53,7 +53,7 @@ class StartPage(tk.Frame):
             label = tk.Label(self, text="        Home Page        ", font=self.controller.title_font,fg="#263942")
             label.grid(row=0, sticky="ew")
             button1 = tk.Button(self, text="   Sign up  ", fg="#ffffff", bg="#263942",command=lambda: self.controller.show_frame("PageOne"))
-            button2 = tk.Button(self, text="   Check attendance  ", fg="#ffffff", bg="#263942",command=lambda: self.controller.show_frame("PageTwo"))
+            button2 = tk.Button(self, text="   Sign in  ", fg="#ffffff", bg="#263942",command=lambda: self.controller.show_frame("PageTwo"))
             button3 = tk.Button(self, text="Quit", fg="#263942", bg="#ffffff", command=self.on_closing)
             button1.grid(row=1, column=0, ipady=3, ipadx=7)
             button2.grid(row=2, column=0, ipady=3, ipadx=2)
@@ -167,8 +167,8 @@ class PageThree(tk.Frame):
         data.get_nameslist()
 
     def trainmodel(self):
-        if self.controller.num_of_images < 350:
-            messagebox.showerror("ERROR", "Not enough Data, Capture at least 350 images!")
+        if self.controller.num_of_images < 100:
+            messagebox.showerror("ERROR", "Not enough Data, Capture at least 100 images!")
             return
         else:
             messagebox.showinfo('Complete','Your data has been added to database')
@@ -185,9 +185,9 @@ class PageFour(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        label = tk.Label(self, text="Face Recognition", font='Helvetica 16 bold')
+        label = tk.Label(self, text="Face Recognition for Log in", font='Helvetica 16 bold')
         label.grid(row=0,column=0, sticky="ew")
-        button1 = tk.Button(self, text="Face Recognition", command=self.openwebcam, fg="#ffffff", bg="#263942")
+        button1 = tk.Button(self, text="Log in", command=self.openwebcam, fg="#ffffff", bg="#263942")
         #button2 = tk.Button(self, text="Emotion Detection", command=self.emot, fg="#ffffff", bg="#263942")
         #button3 = tk.Button(self, text="Gender and Age Prediction", command=self.gender_age_pred, fg="#ffffff", bg="#263942")
         button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")

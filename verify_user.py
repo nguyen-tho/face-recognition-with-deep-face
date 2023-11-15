@@ -10,7 +10,6 @@ import re
 import pandas as pd 
 
 def capture_image():
-    start_time = time.time()
     #file_name = 'captured_image.jpg'
     #model = DeepFace.build_model("VGG-Face")
 # Create a video capture object for your camera (usually 0 for built-in cameras)
@@ -143,13 +142,13 @@ def verified_image(compare, name):
     data_path = f"data/{name}/"
     target = data.get_random_jpg_file(data_path) #get random target image file in user's dataset
     
-    verified_img =  DeepFace.verify(compare, target, enforce_detection=False, model_name='Facenet512')
+    verified_img =  DeepFace.verify(compare, target, enforce_detection=False, model_name='ArcFace')
     verified = verified_img["verified"]
     return verified
 
-def check_identity():
+def find_identity():
     """find user in database"""
-    data_path = 'image_data'
+    data_path = './data'
     cap = cv2.VideoCapture(0)
     while True:
         ret, frame = cap.read()
@@ -163,6 +162,7 @@ def check_identity():
         h = region['h']
         
         confidence = faces[0]["confidence"]
+        
         if confidence > 0.5:
             verified_name = find_user(frame, data_path)
             if verified_name != "":
@@ -175,6 +175,7 @@ def check_identity():
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
+                
         cv2.imshow("Real-time Face Detection", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'): #press 'q' to exit
             break
@@ -183,17 +184,36 @@ def check_identity():
     cv2.destroyAllWindows()
         
 def find_user(image, data_path):
-    name = ''
-    data = DeepFace.find(image, data_path ,detector_backend='ssd', enforce_detection=False, model_name='Facenet512')
-    input_string = str(data[0]["identity"])
-    match = re.search(r'image_data/(\w+).jpg', input_string)
+    find_list = DeepFace.find(image, data_path, enforce_detection=False)
+    find_user_df = find_list[0]
+
+    df = pd.DataFrame(find_user_df)
+    first_10_rows = df.head(10) #find top 10 sample has least cosine similarity
+    first_10_rows['name'] = first_10_rows['identity'].apply(data.extract_subfolder) #find username folder
+
+    name_counts_dict = first_10_rows['name'].value_counts()# count usernames's frequency
+
+# Find the name with the maximum count
+    max_count_name = name_counts_dict.idxmax()# extract name by whose max frequency
+    return max_count_name
     
-    if match:
-        name = match.group(1)
-    
-    # Create the formula string based on the extracted 'name'
-    return name
-    
-#check_identity()  
+#find_identity()  
 #check_attendance('tho')
-check_realtime('tho')
+#check_realtime('tho')
+
+def check_attendance_v2():
+    image = capture_image()
+    data_path = 'data'
+    cv2.imshow("Result", image)
+    
+    verified_name = find_user(image, data_path)
+    if verified_name is not None:
+       info = save_log(verified_name)
+       messagebox.showinfo(f"Congrat {verified_name} !", info[0]+ " has logged in at "+info[1] )
+       
+    else:
+       messagebox.showinfo("Error! Invalid user. Please try again")
+        
+    cv2.destroyAllWindows() 
+    
+check_attendance_v2()
