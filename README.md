@@ -53,7 +53,7 @@ simple attendance system using face recognition
    - UI design: https://github.com/joeVenner/FaceRecognition-GUI-APP
      
 #7. New update:
-   - Solve the problem "cannot detect realtime" by compare current frame from camera and verify it
+   - Solve the problem "cannot detect realtime" by current frame which taken by webcam and verify with user's image dataset
    - Verify current frame with a random image in user's dataset
     
    
