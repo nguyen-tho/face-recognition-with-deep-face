@@ -31,7 +31,7 @@ simple attendance system using face recognition
    - In this project I have just used deepface to verify the identity of a person who sign up his/her information and data has been saved in our database
    - Using verify method to check an image which is similar with one random image in his/her dataset images in database
    ```sh
-   from deepface import Deepface
+   from deepface import DeepFace
    verified_img =  DeepFace.verify(image, image_in_dataset, enforce_detection=False)
    #image is path of image which is captured to verify
    #image_in_dataset is path of image which is in user's dataset
