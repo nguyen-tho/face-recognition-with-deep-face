@@ -11,8 +11,8 @@ import pandas as pd
 
 def capture_image():
     start_time = time.time()
-    file_name = 'captured_image.jpg'
-    model = DeepFace.build_model("VGG-Face")
+    #file_name = 'captured_image.jpg'
+    #model = DeepFace.build_model("VGG-Face")
 # Create a video capture object for your camera (usually 0 for built-in cameras)
     cap = cv2.VideoCapture(0)
         
@@ -30,32 +30,41 @@ def capture_image():
         y = region['y']
         w = region['w']
         h = region['h']
-            
+        confidence = detected_faces[0]["confidence"]
+         
         cv2.rectangle(frame, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
         new_img = frame[y:y+h, x:x+w]
         cv2.imshow("Real-time Face Detection", frame)
-        
-    # Display the resulting frame
-        elapsed_time = time.time()-start_time
-        if cv2.waitKey(1) & 0xFF == ord('q') or elapsed_time > 5: #press 'q' or wait for 5s to capture an image
-            cv2.imwrite(file_name, new_img)
+        #in a moment when detected user's face capture it
+        if confidence > 0.5:  
             break
+    # Display the resulting frame
+        #elapsed_time = time.time()-start_time
+        #if cv2.waitKey(1) & 0xFF == ord('q') or elapsed_time > 5: #press 'q' or wait for 5s to capture an image
+            
+            #break
 # Release the camera
     cap.release()
     cv2.destroyAllWindows()
-    return file_name
+    return new_img
 
 def check_attendance(name):
     """_summary_
 
     Args:
-        name (_type_): _description_
+        name (str): name of user who log in into system
+        Returns:
+        None
+        
+        description:
+        this feature allow user to take a photo automatically after 5s and 
+        use DeepFace.verify method to verify the taken photo and 1 random photo in database
     """
+
     
     image = capture_image()
     
-    img = cv2.imread(image)
-    cv2.imshow("Result", img)
+    cv2.imshow("Result", image)
     verified =verified_image(image, name)
     #set threshold >0.5 to check the result
     #threshold = len(checklist)/data.number_of_samples(name)
@@ -134,7 +143,7 @@ def verified_image(compare, name):
     # code (integer): the number of file name such as tho_30.jpg, code is 30
     code = data.random_code(data.number_of_samples(name)) #generate random code based on number of image in user data
     data_path = f"data/{name}/"
-    verified_img =  DeepFace.verify(compare, data_path+f'{name}_{code}.jpg', enforce_detection=False)
+    verified_img =  DeepFace.verify(compare, data_path+f'{name}_{code}.jpg', enforce_detection=False, model_name='Facenet512')
     verified = verified_img["verified"]
     return verified
 
@@ -155,9 +164,9 @@ def check_identity():
         
         confidence = faces[0]["confidence"]
         if confidence > 0.5:
-            verified_name = find_user(frame, 'image_data')
+            verified_name = find_user(frame, data_path)
             if verified_name != "":
-                text = (verified_name+f'  {confidence:.4f}').upper()
+                text = (verified_name+f'  {confidence*100:.4f}%').upper()
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
@@ -175,14 +184,15 @@ def check_identity():
         
 def find_user(image, data_path):
     name = ''
-    data = DeepFace.find(image, data_path , enforce_detection=False, model_name='Facenet512')
+    data = DeepFace.find(image, data_path ,detector_backend='ssd', enforce_detection=False, model_name='Facenet512')
     input_string = str(data[0]["identity"])
     match = re.search(r'image_data/(\w+).jpg', input_string)
-
+    
     if match:
         name = match.group(1)
     
     # Create the formula string based on the extracted 'name'
     return name
     
-check_identity()    
+#check_identity()  
+check_attendance('tho')
