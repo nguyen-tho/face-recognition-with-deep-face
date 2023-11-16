@@ -1,7 +1,10 @@
 # simple-attendance-system
-simple attendance system using face recognition
+Apply face regcognition to check attendance of student by webcam when they are in an online class.
+Up to now, I have developed 2 features:
+- face recognition on one image which captured by user webcam
+- face recognition on a video on user webcam.
 
-#1. Tutorial:
+#1. Tutorial: for face recogntion on a image
    
    Step 1: download source from github
    ```sh
@@ -44,9 +47,13 @@ simple attendance system using face recognition
    - Can recognize object in weak brigtness environment
    - When signed up user wear glasses. However, while recognition that person do not wear glass -> can recognize
    - Have a good confidence (about more than 90%)
+   - DeepFace use pre-trained model -> do not need to train again
    ### Disadvantages
-   - In the first time need to download model file and weights file -> it spends too much time (about 120 seconds) depends on computer
-   - Cannot detect real-time -> cannot apply to a practical project
+   - In the first time need to download model file and weights file -> it spends too much time (about 120 seconds) depends on computer and size if image database
+   - When add a new user, system will update new pkl weight file, it consumes too much time
+   - Sometimes recognition result may be wrong but confidence still high
+   - When compare with DeepFace.verify method, DeepFace.find method will slower than because need time to determine identity of the captured image
+   - Recognize ability maybe impacted by pre-trained model and detector backend. 
 
 #6. References:
    - Deep face: https://github.com/serengil/deepface .
@@ -55,6 +62,14 @@ simple attendance system using face recognition
 #7. New update:
    - Solve the problem "cannot detect realtime" by current frame which taken by webcam and verify with user's image dataset
    - Verify current frame with a random image in user's dataset
+   - Some detector backends and models can combine
+     ```sh
+     #some detector backend and model may suitable to use
+     detector_backend = opencv, model_name = [VGG-Face, Facenet, Facenet512, ArcFace]
+     detector_backend = ssd, model name = [VGG-Face, ArcFace]
+     detector_backend = retinaface, model_name = VGG-Face # can use but slower than other detector backend
+     #this is my personal knowledge about DeepFace. Can treat it as a reference
+     ```
     
    
    
