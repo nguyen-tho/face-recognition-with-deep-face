@@ -26,7 +26,7 @@ Up to now, I have developed 2 features:
    if you use python 3
    
 #2. Collect data:
-   - System will take a video about 350 frame, user can make several poses as much as possible to create a variety dataset
+   - System will take a video about 100 frames, user can make several poses as much as possible to create a variety dataset
 
 #3. Capture an image to verify:
    - When user need to check in, system will take a photo automatically for 5s after camera/webcam turned on
@@ -38,10 +38,25 @@ Up to now, I have developed 2 features:
    verified_img =  DeepFace.verify(image, image_in_dataset, enforce_detection=False)
    #image is path of image which is captured to verify
    #image_in_dataset is path of image which is in user's dataset
+   #output is a tuple contain verified status, facial area of 2 images, cosine similarity
+   #verified status: bool
+   #facial area [x,y,w,h] values
+   #cosine similarity is distance betwwen 2 vectors which embedded by 2 images. The less cosine the more similarity
    ```
    - if verified value is True -> save log
    - if not -> send alert "try again"
-     
+   - In new version, I use find method to find identity of user who is owner of captured photo or video
+     ```sh
+     from deepface import DeepFace
+     verified_list = DeepFace.find(image, dataset_path, enforce_detection=False)
+     #image is path of image which is captured to verify
+     #dataset_path is path to dataset folder
+     #output is a dataframe of similar images list
+     #each row has identity, facial area amd cosine
+     #identity is path of image in dataset which deepface determine they are similar with captured image
+     #facial area [x,y,w,h] values
+     #cosine similarity is distance betwwen 2 vectors which embedded by 2 images. The less cosine the more similarity
+     ```
 #5. Advantages and Disadvantages
    ### Advantages
    - Can recognize object in weak brigtness environment
