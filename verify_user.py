@@ -12,6 +12,7 @@ import pandas as pd
 def capture_image():
     #file_name = 'captured_image.jpg'
     #model = DeepFace.build_model("VGG-Face")
+    start_time = time.time()
 # Create a video capture object for your camera (usually 0 for built-in cameras)
     cap = cv2.VideoCapture(0)
         
@@ -32,10 +33,11 @@ def capture_image():
         confidence = detected_faces[0]["confidence"]
          
         cv2.rectangle(frame, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
-        new_img = frame[y:y+h, x:x+w]
         cv2.imshow("Real-time Face Detection", frame)
+        new_img = frame[y:y+h, x:x+w]
+        elapsed_time = time.time()-start_time
         #in a moment when detected user's face capture it
-        if confidence > 0.5:  
+        if confidence > 0.5 and elapsed_time >5: #wait 5s and capture immediately  
             break
     # Display the resulting frame
         #elapsed_time = time.time()-start_time
@@ -93,7 +95,8 @@ def save_log(name):
     return log_data
               
 def main_app(name):
-    check_attendance(name)
+    check_attendance_v2()
+    
  
 def check_realtime(name):
     data_path = 'data/' + name
@@ -110,11 +113,12 @@ def check_realtime(name):
         h = region['h']
         
         confidence = faces[0]["confidence"]
+        verified, _ = verified_image(frame, name)
         #new_img = frame[y:y+h, x:x+w]
         if confidence > 0.5:
-            verified = verified_image(frame, name)
+           
             if verified:
-                text = (name+f'  {confidence:.4f}').upper()
+                text = (name+f'  {confidence*100:.4f}%').upper()
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
@@ -142,9 +146,10 @@ def verified_image(compare, name):
     data_path = f"data/{name}/"
     target = data.get_random_jpg_file(data_path) #get random target image file in user's dataset
     
-    verified_img =  DeepFace.verify(compare, target, enforce_detection=False, model_name='ArcFace')
+    verified_img =  DeepFace.verify(compare, target, enforce_detection=False, model_name='Facenet512')
     verified = verified_img["verified"]
-    return verified
+    accuracy = 1 - float(verified_img["distance"])
+    return verified, accuracy
 
 def find_identity():
     """find user in database"""
@@ -163,15 +168,15 @@ def find_identity():
         
         confidence = faces[0]["confidence"]
         
-        if confidence > 0.5:
-            verified_name = find_user(frame, data_path)
-            if verified_name != "":
-                text = (verified_name+f'  {confidence*100:.4f}%').upper()
+        if confidence > 0.60:
+            verified_name = find_user(frame, data_path,'Facenet512')
+            if verified_name[0] != "":
+                text = (verified_name[0] + f'  {confidence*100:.4f}%').upper()
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
             else: 
-                text = "UNVERIFIED"
+                text = "NOT FOUND IDENTITY"
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
@@ -183,37 +188,48 @@ def find_identity():
     cap.release()
     cv2.destroyAllWindows()
         
-def find_user(image, data_path):
-    find_list = DeepFace.find(image, data_path, enforce_detection=False)
+
+def find_user(image, data_path, model_name='VGG-Face'):
+    find_list = DeepFace.find(image, data_path, enforce_detection=False,model_name=model_name)
     find_user_df = find_list[0]
 
     df = pd.DataFrame(find_user_df)
-    first_10_rows = df.head(10) #find top 10 sample has least cosine similarity
-    first_10_rows['name'] = first_10_rows['identity'].apply(data.extract_subfolder) #find username folder
+    top_rows = df[df[f'{model_name}_cosine'] < 0.15]
+    top_5_rows = top_rows.head(10)  # Corrected to find top 5 rows
+    top_5_rows['name'] = top_5_rows['identity'].apply(data.extract_subfolder)
 
-    name_counts_dict = first_10_rows['name'].value_counts()# count usernames's frequency
+# Calculate the mean of 'VGG-Face_cosine' for the selected rows
+    if not top_5_rows.empty:
+       max_count_name = top_5_rows['name'].value_counts().idxmax()
 
-# Find the name with the maximum count
-    max_count_name = name_counts_dict.idxmax()# extract name by whose max frequency
-    return max_count_name
+# Filter rows with the determined name
+       selected_rows = top_5_rows[top_5_rows['name'] == max_count_name]
+       mean_cosine_by_name = selected_rows.groupby('name')[f'{model_name}_cosine'].mean().reset_index()
+       user_name = mean_cosine_by_name['name'].iloc[0]
+       acc = 1 - float(mean_cosine_by_name[f'{model_name}_cosine'].iloc[0])
+       
+    else:
+        user_name = ""
+        acc = 0
+    return [str(user_name), round(acc*100, 3)]
+    #return max_count_name, acc
     
-#find_identity()  
-#check_attendance('tho')
-#check_realtime('tho')
+find_identity()  #find identity of user by a realtime video
+#check_attendance('tho') verify a user based on an image captured by webcam
+#check_realtime('tho')#  verify user using a realtime video on webcam
 
 def check_attendance_v2():
     image = capture_image()
     data_path = 'data'
     cv2.imshow("Result", image)
-    
-    verified_name = find_user(image, data_path)
-    if verified_name is not None:
-       info = save_log(verified_name)
-       messagebox.showinfo(f"Congrat {verified_name} !", info[0]+ " has logged in at "+info[1] )
+    verified_name = find_user(image, data_path,'Facenet512')
+    if verified_name[0] != "":
+       info = save_log(verified_name[0])
+       messagebox.showinfo(f"Congrat {verified_name[0]} !", info[0]+ " has logged in at "+info[1] )
        
     else:
-       messagebox.showinfo("Error! Invalid user. Please try again")
+       messagebox.showinfo("Error! Cannot find identity. Please try again")
         
     cv2.destroyAllWindows() 
     
-check_attendance_v2()
+#check_attendance_v2() #check identity based on an image captured by webcam
