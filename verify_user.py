@@ -214,9 +214,9 @@ def find_user(image, data_path, model_name='VGG-Face'):
     return [str(user_name), round(acc*100, 3)]
     #return max_count_name, acc
     
-#find_identity()  
-#check_attendance('tho')
-#check_realtime('tho')
+#find_identity()  #find identity of user by a realtime video
+#check_attendance('tho') verify a user based on an image captured by webcam
+#check_realtime('tho')#  verify user using a realtime video on webcam
 
 def check_attendance_v2():
     image = capture_image()
@@ -232,4 +232,4 @@ def check_attendance_v2():
         
     cv2.destroyAllWindows() 
     
-#check_attendance_v2()
+#check_attendance_v2() #check identity based on an image captured by webcam
