@@ -154,7 +154,7 @@ class PageThree(tk.Frame):
         self.numimglabel = tk.Label(self, text="Number of images captured = 0", font='Helvetica 12 bold', fg="#263942")
         self.numimglabel.grid(row=0, column=0, columnspan=2, sticky="ew", pady=10)
         self.capturebutton = tk.Button(self, text="Capture Data Set", fg="#ffffff", bg="#263942", command=self.capimg)
-        self.trainbutton = tk.Button(self, text="Confirm", fg="#ffffff", bg="#263942",command=self.trainmodel)
+        self.trainbutton = tk.Button(self, text="Confirm", fg="#ffffff", bg="#263942",command=self.confirm)
         self.capturebutton.grid(row=1, column=0, ipadx=5, ipady=4, padx=10, pady=20)
         self.trainbutton.grid(row=1, column=1, ipadx=5, ipady=4, padx=10, pady=20)
 
@@ -166,7 +166,7 @@ class PageThree(tk.Frame):
         self.numimglabel.config(text=str(f"Number of images captured = {data.number_of_samples(self.controller.active_name)}"))
         data.get_nameslist()
 
-    def trainmodel(self):
+    def confirm(self):
         if self.controller.num_of_images < 100:
             messagebox.showerror("ERROR", "Not enough Data, Capture at least 100 images!")
             return
@@ -188,17 +188,24 @@ class PageFour(tk.Frame):
         label = tk.Label(self, text="Face Recognition for Log in", font='Helvetica 16 bold')
         label.grid(row=0,column=0, sticky="ew")
         button1 = tk.Button(self, text="Log in", command=self.openwebcam, fg="#ffffff", bg="#263942")
-        #button2 = tk.Button(self, text="Emotion Detection", command=self.emot, fg="#ffffff", bg="#263942")
-        #button3 = tk.Button(self, text="Gender and Age Prediction", command=self.gender_age_pred, fg="#ffffff", bg="#263942")
+        button2 = tk.Button(self, text="Find identity Realtime", command=self.find, fg="#ffffff", bg="#263942")
+        button3 = tk.Button(self, text="Verify Realtime", command=self.verify_realtime, fg="#ffffff", bg="#263942")
         button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")
         button1.grid(row=1,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-        #button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-        #button3.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button2.grid(row=2,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button3.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
         button4.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
 
     def openwebcam(self):
-        v.main_app(self.controller.active_name)
+        v.check_attendance_v2()
         self.controller.show_frame("StartPage")
+        
+    def find(self):
+        v.find_identity()
+        #self.controller.show_frame("StartPage")
+        
+    def verify_realtime(self):
+        v.check_realtime(self.controller.active_name)
         
     '''
     def gender_age_pred(self):

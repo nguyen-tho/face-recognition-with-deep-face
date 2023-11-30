@@ -214,7 +214,7 @@ def find_user(image, data_path, model_name='VGG-Face'):
     return [str(user_name), round(acc*100, 3)]
     #return max_count_name, acc
     
-find_identity()  
+#find_identity()  
 #check_attendance('tho')
 #check_realtime('tho')
 
