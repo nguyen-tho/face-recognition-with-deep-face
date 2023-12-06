@@ -118,7 +118,7 @@ def check_realtime(name):
         if confidence > 0.5:
            
             if verified:
-                text = (name+f'  {confidence*100:.4f}%').upper()
+                text = ('VERIFIED: '+name+f'  {confidence*100:.4f}%').upper()
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
@@ -171,7 +171,7 @@ def find_identity():
         if confidence > 0.60:
             verified_name = find_user(frame, data_path,'Facenet512')
             if verified_name[0] != "":
-                text = (verified_name[0] + f'  {confidence*100:.4f}%').upper()
+                text = ('FOUND: '+verified_name[0] + f'  {confidence*100:.4f}%').upper()
                 font = cv2.FONT_HERSHEY_PLAIN
                 frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
