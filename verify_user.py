@@ -214,6 +214,7 @@ def find_user(image, data_path, model_name='VGG-Face'):
     return [str(user_name), round(acc*100, 3)]
     #return max_count_name, acc
     
+
 def update_pkl_file(name):
     image = f'./data/{name}/{name}_0.jpg'
     data_path = './data'
@@ -237,6 +238,11 @@ def update_pkl_file(name):
     verified_name = find_user(image, data_path,model_name)
     if verified_name[0] != "":
          messagebox.showinfo('Complete','Your data has been added to database')
+
+#find_identity()  #find identity of user by a realtime video
+#check_attendance('tho') verify a user based on an image captured by webcam
+#check_realtime('tho')#  verify user using a realtime video on webcam
+
 
 def check_attendance_v2():
     image = capture_image()
