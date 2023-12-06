@@ -214,9 +214,35 @@ def find_user(image, data_path, model_name='VGG-Face'):
     return [str(user_name), round(acc*100, 3)]
     #return max_count_name, acc
     
+
+def update_pkl_file(name):
+    image = f'./data/{name}/{name}_0.jpg'
+    data_path = './data'
+    #file_extension = ".pkl"
+    model_name = 'Facenet512'
+
+# Get a list of all files in the directory
+    files = os.listdir(data_path)
+
+# Filter files with the specified extension
+    pkl_file = f'./data/representations_{model_name.lower()}.pkl'
+
+# Delete each .pkl file
+    
+    file_path = os.path.join(data_path, pkl_file)
+    try:
+        os.remove(file_path)
+        print(f"File '{pkl_file}' deleted successfully.")
+    except OSError as e:
+        print(f"Error deleting file '{pkl_file}': {e}")
+    verified_name = find_user(image, data_path,model_name)
+    if verified_name[0] != "":
+         messagebox.showinfo('Complete','Your data has been added to database')
+
 #find_identity()  #find identity of user by a realtime video
 #check_attendance('tho') verify a user based on an image captured by webcam
 #check_realtime('tho')#  verify user using a realtime video on webcam
+
 
 def check_attendance_v2():
     image = capture_image()

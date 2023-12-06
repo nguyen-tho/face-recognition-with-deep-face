@@ -22,7 +22,7 @@ class mainUI(tk.Tk):
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)
         self.frames = {}
-        for F in (StartPage, PageOne, PageTwo, PageThree, PageFour):
+        for F in (StartPage, PageOne, PageTwo, PageThree, PageFour, PageFive, PageSix):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
@@ -53,7 +53,7 @@ class StartPage(tk.Frame):
             label = tk.Label(self, text="        Home Page        ", font=self.controller.title_font,fg="#263942")
             label.grid(row=0, sticky="ew")
             button1 = tk.Button(self, text="   Sign up  ", fg="#ffffff", bg="#263942",command=lambda: self.controller.show_frame("PageOne"))
-            button2 = tk.Button(self, text="   Sign in  ", fg="#ffffff", bg="#263942",command=lambda: self.controller.show_frame("PageTwo"))
+            button2 = tk.Button(self, text="   Face Recognition  ", fg="#ffffff", bg="#263942",command=lambda: self.controller.show_frame("PageSix"))
             button3 = tk.Button(self, text="Quit", fg="#263942", bg="#ffffff", command=self.on_closing)
             button1.grid(row=1, column=0, ipady=3, ipadx=7)
             button2.grid(row=2, column=0, ipady=3, ipadx=2)
@@ -124,7 +124,7 @@ class PageTwo(tk.Frame):
             messagebox.showerror("ERROR", "Name cannot be 'None'")
             return
         self.controller.active_name = self.user_name.get()
-        self.controller.show_frame("PageFour")  
+        self.controller.show_frame("PageFive")  
         
     def clear(self):
         self.user_name.delete(0, 'end')
@@ -171,12 +171,13 @@ class PageThree(tk.Frame):
             messagebox.showerror("ERROR", "Not enough Data, Capture at least 100 images!")
             return
         else:
-            messagebox.showinfo('Complete','Your data has been added to database')
+            v.update_pkl_file(self.controller.active_name)# update pkl file for a first time
+           
         '''
         train_classifer(self.controller.active_name)
         messagebox.showinfo("SUCCESS", "The model has been successfully trained!")
         '''
-        self.controller.show_frame("PageFour")
+        self.controller.show_frame("PageSix")
 
 
 class PageFour(tk.Frame):
@@ -185,16 +186,14 @@ class PageFour(tk.Frame):
         tk.Frame.__init__(self, parent)
         self.controller = controller
 
-        label = tk.Label(self, text="Face Recognition for Log in", font='Helvetica 16 bold')
+        label = tk.Label(self, text="Find identity Features", font='Helvetica 16 bold')
         label.grid(row=0,column=0, sticky="ew")
-        button1 = tk.Button(self, text="Log in", command=self.openwebcam, fg="#ffffff", bg="#263942")
+        button1 = tk.Button(self, text="Find identity on an image", command=self.openwebcam, fg="#ffffff", bg="#263942")
         button2 = tk.Button(self, text="Find identity Realtime", command=self.find, fg="#ffffff", bg="#263942")
-        button3 = tk.Button(self, text="Verify Realtime", command=self.verify_realtime, fg="#ffffff", bg="#263942")
         button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")
         button1.grid(row=1,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-        button2.grid(row=2,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-        button3.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
-        button4.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button4.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
 
     def openwebcam(self):
         v.check_attendance_v2()
@@ -204,8 +203,7 @@ class PageFour(tk.Frame):
         v.find_identity()
         #self.controller.show_frame("StartPage")
         
-    def verify_realtime(self):
-        v.check_realtime(self.controller.active_name)
+    
         
     '''
     def gender_age_pred(self):
@@ -214,8 +212,36 @@ class PageFour(tk.Frame):
         emotion()
 '''
 
+class PageFive(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="Verify user Features", font='Helvetica 16 bold')
+        label.grid(row=0,column=0, sticky="ew")
+        button1 = tk.Button(self, text="Verify on an image", command=self.verify_image, fg="#ffffff", bg="#263942")
+        button2 = tk.Button(self, text="Verify Realtime", command=self.verify_realtime, fg="#ffffff", bg="#263942")
+        button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")
+        button1.grid(row=1,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button4.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+               
+    def verify_realtime(self):
+        v.check_realtime(self.controller.active_name)
+    def verify_image(self):
+        v.check_attendance(self.controller.active_name)
 
-
+class PageSix(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.controller = controller
+        label = tk.Label(self, text="Choose Features", font='Helvetica 16 bold')
+        label.grid(row=0,column=0, sticky="ew")
+        button1 = tk.Button(self, text="Verify user", command=lambda: self.controller.show_frame("PageTwo"), fg="#ffffff", bg="#263942")
+        button2 = tk.Button(self, text="Find user", command=lambda: self.controller.show_frame("PageFour"), fg="#ffffff", bg="#263942")
+        button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")
+        button1.grid(row=1,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
+        button4.grid(row=2,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
 app = mainUI()
 app.iconphoto(True, tk.PhotoImage(file='icon.ico'))
 app.mainloop()

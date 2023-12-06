@@ -28,10 +28,12 @@ def create_dataset(name):
         y = region['y']
         w = region['w']
         h = region['h']
-        print(x, y, w, h)
+        #print(x, y, w, h)
         cv2.rectangle(frame, (x, y), ((x + w), (y + h)), (0, 255, 0), 2)
-        cv2.imshow("Real-time Face Detection", frame)
         new_img = frame[y:y+h, x:x+w]
+        cv2.putText(frame, "Face Detected", (x, y-5), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255))
+        cv2.putText(frame, str(str(num_of_images)+" images captured"), (x, y+h+20), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 0, 255))
+        cv2.imshow("Real-time Face Detection", frame)
         try :
             cv2.imwrite(str(path+"/"+name+"_"+str(num_of_images)+".jpg"), new_img)
             num_of_images += 1
@@ -39,12 +41,13 @@ def create_dataset(name):
 
             pass
         key = cv2.waitKey(1) & 0xFF
-        if key == ord("q") or key == 27 or num_of_images > 350: #take 300 frames
+        if key == ord("q") or key == 27 or num_of_images >= 100: #take 100 frames
             break
     cv2.destroyAllWindows()
     cap.release()
     
 #take frames by extract a video 
+'''
 def take_video(name, video):
     path = "./data/" + name
     num_of_images = 0
@@ -84,7 +87,7 @@ def take_video(name, video):
         if key == ord("q") or key == 27 or num_of_images > 500: #take 500 frames
             break
         cv2.destroyAllWindows()
-        
+   '''     
 
 def adjust_brightness(frame, alpha, beta):
     # Apply brightness adjustment to a single frame
