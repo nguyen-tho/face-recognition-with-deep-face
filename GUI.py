@@ -4,6 +4,7 @@ from tkinter import messagebox,PhotoImage
 from tkinter import font as tkfont
 import create_dataset as data
 import verify_user as v
+import verify_users as v2
 
 data.get_nameslist()
 names = data.read_nameslist()
@@ -189,7 +190,8 @@ class PageFour(tk.Frame):
         label = tk.Label(self, text="Find identity Features", font='Helvetica 16 bold')
         label.grid(row=0,column=0, sticky="ew")
         button1 = tk.Button(self, text="Find identity on an image", command=self.openwebcam, fg="#ffffff", bg="#263942")
-        button2 = tk.Button(self, text="Find identity Realtime", command=self.find, fg="#ffffff", bg="#263942")
+        button2 = tk.Button(self, text="Find identity Realtime (1 person)", command=self.find, fg="#ffffff", bg="#263942")
+        button3 = tk.Button(self, text="Find identity Realtime (more than 1 person)", command=self.findPeople, fg="#ffffff", bg="#263942")
         button4 = tk.Button(self, text="Go to Home Page", command=lambda: self.controller.show_frame("StartPage"), bg="#ffffff", fg="#263942")
         button1.grid(row=1,column=0, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
         button2.grid(row=1,column=1, sticky="ew", ipadx=5, ipady=4, padx=10, pady=10)
@@ -203,7 +205,8 @@ class PageFour(tk.Frame):
         v.find_identity()
         #self.controller.show_frame("StartPage")
         
-    
+    def findPeople():
+        v2.check_users()
         
     '''
     def gender_age_pred(self):

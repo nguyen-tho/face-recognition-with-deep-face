@@ -72,7 +72,7 @@ def check_attendance(name):
 
     if verified:
         info = save_log(name)
-        messagebox.showinfo("Congrat", info[0]+ " has checked in at "+info[1] )
+        messagebox.showinfo("Congrat", info[0]+ " has been verified at "+info[1] )
        
     else:
         messagebox.showinfo("Error", "You are not "+ name+" . Please try again")
