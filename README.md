@@ -85,6 +85,8 @@ Up to now, I have developed 2 features:
      detector_backend = retinaface, model_name = VGG-Face # can use but slower than other detector backend
      #this is my personal knowledge about DeepFace. Can treat it as a reference
      ```
+#8. Demo
+
     
    
    
