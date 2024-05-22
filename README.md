@@ -86,6 +86,7 @@ Up to now, I have developed 2 features:
      #this is my personal knowledge about DeepFace. Can treat it as a reference
      ```
 #8. Demo
+
 Verify a person
    ![verify a peerson](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/verify_a_person.png)
 
