@@ -88,10 +88,15 @@ Up to now, I have developed 2 features:
 #8. Demo
 
 Verify a person
+
    ![verify a peerson](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/verify_a_person.png)
 
 Find identity of a person
+
    ![find_identity](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/find_identity.png)
-    
+  
+#9. Contact:
+
+    Please contact with me at this email address to discuss: nguyencongtho116@gmail.com  
    
    
