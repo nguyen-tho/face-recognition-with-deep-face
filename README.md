@@ -95,7 +95,7 @@ Find identity of a person
 
    ![find_identity](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/find_identity.png)
   
-#9. Contact:
+9. Contact:
 
     Please contact with me at this email address to discuss: nguyencongtho116@gmail.com  
    
