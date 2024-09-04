@@ -8,7 +8,7 @@ Up to now, I have developed 2 features:
    
    Step 1: download source from github
    ```sh
-   $ git clone https://github.com/nguyen-tho/simple-attendance-system.git
+   $ git clone https://github.com/nguyen-tho/face-recognition-with-deep-face.git
    ```
    Step 2: install pakages by command.
    ```sh
