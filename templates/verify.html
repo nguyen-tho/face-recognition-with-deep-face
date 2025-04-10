@@ -1,0 +1,140 @@
+<!-- verify.html -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Face Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+    }
+
+    .form-container, .video-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 45%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    video, canvas {
+      border-radius: 10px;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Form -->
+    <div class="form-container">
+      <h1>Face Verification</h1>
+      <input type="text" id="username" placeholder="Enter your name" required>
+      <br>
+      <button onclick="captureImage()">Capture</button>
+      <button onclick="submitImage()">Verify</button>
+      <p id="result"></p>
+    </div>
+
+    <!-- Webcam Feed -->
+    <div class="video-container">
+      <h2>Webcam</h2>
+      <video id="video" autoplay playsinline></video>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const resultText = document.getElementById('result');
+
+    // Access webcam
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch((err) => {
+        console.error("Error accessing webcam:", err);
+      });
+
+    // Capture image from video
+    function captureImage() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+      resultText.innerText = "Image captured.";
+    }
+
+    // Send image + username to Flask API
+    function submitImage() {
+      const username = document.getElementById('username').value;
+      if (!username) {
+        alert("Please enter your name.");
+        return;
+      }
+
+      canvas.toBlob(function(blob) {
+        const formData = new FormData();
+        formData.append('image', blob, 'captured.jpg');
+        formData.append('name', username);
+
+        fetch('/verify', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.verified !== undefined) {
+            resultText.innerText = `✅ Verified: ${data.verified}, Accuracy: ${(data.accuracy * 100).toFixed(2)}%`;
+          } else {
+            resultText.innerText = `❌ Error: ${data.error}`;
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          resultText.innerText = "❌ Error during verification.";
+        });
+      }, 'image/jpeg');
+    }
+  </script>
+</body>
+</html>

@@ -79,3 +79,134 @@
     </script>
 </body>
 </html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Face Capture</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .wrapper {
+            display: flex;
+            justify-content: space-between;
+            width: 80%;
+        }
+        /* Form Container (Left) */
+        .form-container {
+            text-align: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 40%;
+        }
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Video Container (Right) */
+        .video-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 55%;
+        }
+        .video-container img {
+            width: 100%;
+            height: auto;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-bar-container {
+            margin-top: 10px;
+            width: 100%;
+        }
+        progress {
+            width: 100%;
+            height: 40px; /* Increased height for larger progress bar */
+            border-radius: 5px; /* Add rounding to match the UI */
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Form Container (Left) -->
+        <div class="form-container">
+            <h1>Face Capture</h1>
+            <input type="text" id="name" placeholder="Enter your name">
+            <button id="start-capture" onclick="startCapture()">Start Capture</button>
+            <button id="return-home" onclick="window.location.href = '/'">Return Home Page</button>
+        </div>
+
+        <!-- Video and Progress Bar (Right) -->
+        <div class="video-container">
+            <h1>Webcam Feed</h1>
+            <img id="webcam-feed" src="" alt="Webcam Feed" width="640" height="480">
+            <!-- Progress Bar -->
+            <div class="progress-bar-container">
+                <progress id="progress-bar" value="0" max="100"></progress>
+                <div id="progress-label" style="text-align: center; margin-top: 5px;">Collecting data 0%</div> <!-- Progress label -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+
+        function startCapture() {
+            const name = document.getElementById('name').value;
+            if (name) {
+                document.getElementById('webcam-feed').src = `/start_capture?name=${name}`;
+                    
+                    // Start the progress bar animation
+                let progressBar = document.getElementById('progress-bar');
+                let progress = 0;
+                let progressLabel = document.getElementById('progress-label'); // Label to show progress percentage
+                    
+                    // Example of a simple progress increment, you can replace it with actual logic
+                let interval = setInterval(function () {
+                    progress += 10; // Adjust the step here as needed
+                    progressBar.value = progress;
+                    progressLabel.innerHTML ='Collecting data '+ progress + '%'; // Update the label with the current progress
+                        
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        alert('Face capture complete!');
+                    }
+                }, 1000); // Adjust the duration as needed
+            } else {
+                alert('Please enter a name.');
+            }
+        }
+        </script>
+</body>
+</html>
