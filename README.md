@@ -8,7 +8,7 @@ Up to now, I have developed 2 features:
    
    Step 1: download source from github
    ```sh
-   $ git clone https://github.com/nguyen-tho/simple-attendance-system.git
+   $ git clone https://github.com/nguyen-tho/face-recognition-with-deep-face.git
    ```
    Step 2: install pakages by command.
    ```sh
@@ -85,6 +85,18 @@ Up to now, I have developed 2 features:
      detector_backend = retinaface, model_name = VGG-Face # can use but slower than other detector backend
      #this is my personal knowledge about DeepFace. Can treat it as a reference
      ```
-    
+#8. Demo
+
+Verify a person
+
+   ![verify a peerson](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/verify_a_person.png)
+
+Find identity of a person
+
+   ![find_identity](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/find_identity.png)
+  
+9. Contact:
+
+    Please contact with me at this email address to discuss: nguyencongtho116@gmail.com  
    
    
