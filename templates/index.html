@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Attendance System|Home Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Face Recognition</h1>
+        </div>
+        <div class="content">
+            <img src="{{ url_for('static', filename='images/icon.ico') }}" alt="Face Recognition Icon">
+            <div class="buttons">
+                <button onclick="window.location.href='/signup';">Sign up</button>
+                <button onclick="window.location.href='/recognize';">Face Recognition</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
