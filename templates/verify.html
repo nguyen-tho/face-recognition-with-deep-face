@@ -123,9 +123,14 @@
         })
         .then(response => response.json())
         .then(data => {
-          if (data.verified !== undefined) {
-            resultText.innerText = `✅ Verified: ${data.verified}, Accuracy: ${(data.accuracy * 100).toFixed(2)}%`;
-          } else {
+          if (data.verified !== undefined && data.accuracy !== undefined) {
+            if (data.verified) {
+              resultText.innerText = `✅ Verified, Accuracy: ${(data.accuracy * 100).toFixed(2)}%`;
+            } else {
+              resultText.innerText = `❌ Not Verified, Accuracy: ${(data.accuracy * 100).toFixed(2)}%`;
+            }
+          } 
+          else {
             resultText.innerText = `❌ Error: ${data.error}`;
           }
         })
