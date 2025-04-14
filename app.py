@@ -6,6 +6,7 @@ import os
 app = Flask(__name__)
 from create_dataset import get_random_jpg_file
 from PIL import Image
+import numpy as np
 
 
 @app.route('/')
@@ -121,14 +122,103 @@ def verify_image():
         verified = bool(result['verified'])  # convert from numpy.bool_ to Python bool
         accuracy = 1 - float(result["distance"])
 
-
-
-
         # Clean up
         if os.path.exists(compare_path):
             os.remove(compare_path)
 
         return jsonify({'verified': verified, 'accuracy': round(accuracy, 4)})
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+def verified_image(frame, name):
+    """
+    Helper function to verify the face in the frame against the stored image.
+    Replace with your actual verification logic.
+    """
+    # Placeholder for actual verification.
+    # You'll need to implement the DeepFace.verify part here.
+    # Example (replace 'data/' + name with your actual target image path):
+    try:
+        result = DeepFace.verify(img1_path=frame, img2_path='data/' + name, enforce_detection=False)
+        return result['verified'], result['distance'] # return verified status and distance
+    except Exception as e:
+        print(f"Verification error: {e}")
+        return False, 1.0  # Return False and a high distance value on error
+
+def generate_frames(name):
+    """
+    Generator function to continuously capture frames, process them, and yield them.
+    """
+    cap = cv2.VideoCapture(0)  # Open the default camera
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+
+        try:
+            faces = DeepFace.extract_faces(frame, detector_backend='ssd', enforce_detection=False)
+            if faces:
+                region = faces[0]["facial_area"]
+                x, y, w, h = region['x'], region['y'], region['w'], region['h']
+                confidence = faces[0]["confidence"]
+                verified, distance = verified_image(frame, name)
+
+                if confidence > 0.5:
+                    if verified:
+                        text = f'VERIFIED: {name} {confidence * 100:.4f}%'.upper()
+                        color = (0, 255, 0)  # Green for verified
+                    else:
+                        text = "UNVERIFIED"
+                        color = (0, 0, 255)  # Red for unverified
+
+                    cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+                    cv2.putText(frame, text, (x, y - 4), cv2.FONT_HERSHEY_PLAIN, 1, color, 1, cv2.LINE_AA)
+
+        except Exception as e:
+            print(f"Error processing frame: {e}")
+            pass # handle error, such as no face detected
+
+        # Convert frame to JPEG and yield it
+        ret, buffer = cv2.imencode('.jpg', frame)
+        if ret:
+            frame_bytes = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+        else:
+            print("Encoding failed")
+            break
+
+    cap.release()
+    
+@app.route('/verify_realtime')
+def verify_realtime_page():
+    return render_template('verify_realtime.html')
+   
+@app.route('/verify_realtime', methods=['POST'])
+def verify_api():
+    """
+    Flask route to verify a face from an uploaded image.
+    """
+    if 'image' not in request.files or 'name' not in request.form:
+        return jsonify({'error': 'Image and name are required'}), 400
+
+    image_file = request.files['image']
+    name = request.form['name']
+
+    # Read the uploaded image
+    image_bytes = image_file.read()
+    image_np = np.frombuffer(image_bytes, np.uint8)
+    frame = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
+
+    try:
+        faces = DeepFace.extract_faces(frame, detector_backend='ssd', enforce_detection=False)
+        if not faces:
+            return jsonify({'verified': False, 'message': 'No face detected'}), 200
+
+        verified, distance = verified_image(frame, name)
+        return jsonify({'verified': verified, 'distance': distance}), 200
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
