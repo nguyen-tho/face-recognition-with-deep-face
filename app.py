@@ -7,6 +7,8 @@ app = Flask(__name__)
 from create_dataset import get_random_jpg_file
 from PIL import Image
 import numpy as np
+from verify_user import verified_image
+import base64
 
 
 @app.route('/')
@@ -26,7 +28,7 @@ def user_data(name):
         os.makedirs(path)
     except:
         return {'message': 'This user is existed'}, 400
-def gen_frames(name):
+def capture_data(name):
     user_data(name)
         
     num_of_images=0
@@ -75,7 +77,7 @@ def features():
 def start_capture():
     name = request.args.get('name')  # Get name from query string (for GET requests)
     if name:
-        return Response(gen_frames(name), mimetype='multipart/x-mixed-replace; boundary=frame')
+        return Response(capture_data(name), mimetype='multipart/x-mixed-replace; boundary=frame')
     else:
         return {'message': 'No name provided'}, 400
     
@@ -114,13 +116,13 @@ def verify_image():
 
         # Verify identity
         try:
-             result = DeepFace.verify(compare_path, target_img_path, enforce_detection=False, model_name='Facenet512')
+             verified, accuracy = verified_image(compare_path, username)
         except Exception as e:
             print("DeepFace error:", str(e))  # Log to console
             return jsonify({'error': f'DeepFace failed: {str(e)}'}), 500
 
-        verified = bool(result['verified'])  # convert from numpy.bool_ to Python bool
-        accuracy = 1 - float(result["distance"])
+        verified = bool(verified)  # convert from numpy.bool_ to Python bool
+        accuracy = float(accuracy)  # convert from numpy.float64 to Python float
 
         # Clean up
         if os.path.exists(compare_path):
@@ -132,97 +134,56 @@ def verify_image():
         return jsonify({'error': str(e)}), 500
 
 
-def verified_image(frame, name):
-    """
-    Helper function to verify the face in the frame against the stored image.
-    Replace with your actual verification logic.
-    """
-    # Placeholder for actual verification.
-    # You'll need to implement the DeepFace.verify part here.
-    # Example (replace 'data/' + name with your actual target image path):
-    try:
-        result = DeepFace.verify(img1_path=frame, img2_path='data/' + name, enforce_detection=False)
-        return result['verified'], result['distance'] # return verified status and distance
-    except Exception as e:
-        print(f"Verification error: {e}")
-        return False, 1.0  # Return False and a high distance value on error
 
-def generate_frames(name):
-    """
-    Generator function to continuously capture frames, process them, and yield them.
-    """
-    cap = cv2.VideoCapture(0)  # Open the default camera
+def generate_frames(username):
+    cap = cv2.VideoCapture(0)  # Start capturing from webcam
     while True:
-        ret, frame = cap.read()
-        if not ret:
+        success, frame = cap.read()
+        if not success:
             break
-
-        try:
-            faces = DeepFace.extract_faces(frame, detector_backend='ssd', enforce_detection=False)
-            if faces:
-                region = faces[0]["facial_area"]
-                x, y, w, h = region['x'], region['y'], region['w'], region['h']
-                confidence = faces[0]["confidence"]
-                verified, distance = verified_image(frame, name)
-
-                if confidence > 0.5:
-                    if verified:
-                        text = f'VERIFIED: {name} {confidence * 100:.4f}%'.upper()
-                        color = (0, 255, 0)  # Green for verified
-                    else:
-                        text = "UNVERIFIED"
-                        color = (0, 0, 255)  # Red for unverified
-
-                    cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
-                    cv2.putText(frame, text, (x, y - 4), cv2.FONT_HERSHEY_PLAIN, 1, color, 1, cv2.LINE_AA)
-
-        except Exception as e:
-            print(f"Error processing frame: {e}")
-            pass # handle error, such as no face detected
-
-        # Convert frame to JPEG and yield it
-        ret, buffer = cv2.imencode('.jpg', frame)
-        if ret:
-            frame_bytes = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
         else:
-            print("Encoding failed")
-            break
+            try:
+                faces = DeepFace.extract_faces(frame, detector_backend='ssd', enforce_detection=False)
+                if faces:
+                    region = faces[0]["facial_area"]
+                    x = region['x']
+                    y = region['y']
+                    w = region['w']
+                    h = region['h']
+                    confidence = faces[0]["confidence"]
+
+                    verified, _ = verified_image(frame, username)
+
+                    if confidence > 0.5:
+                        if verified:
+                            text = ('VERIFIED: '+username+f'  {confidence*100:.2f}%').upper()
+                            color = (0, 255, 0)
+                        else:
+                            text = "UNVERIFIED"
+                            color = (0, 0, 255)
+
+                        cv2.rectangle(frame, (x, y), (x + w, y + h), color, 2)
+                        cv2.putText(frame, text, (x, y - 4), cv2.FONT_HERSHEY_PLAIN, 1, color, 1, cv2.LINE_AA)
+            except Exception as e:
+                print("Error:", e)
+
+            # Encode the frame in JPEG format
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
     cap.release()
-    
 @app.route('/verify_realtime')
 def verify_realtime_page():
     return render_template('verify_realtime.html')
-   
-@app.route('/verify_realtime', methods=['POST'])
-def verify_api():
-    """
-    Flask route to verify a face from an uploaded image.
-    """
-    if 'image' not in request.files or 'name' not in request.form:
-        return jsonify({'error': 'Image and name are required'}), 400
 
-    image_file = request.files['image']
-    name = request.form['name']
-
-    # Read the uploaded image
-    image_bytes = image_file.read()
-    image_np = np.frombuffer(image_bytes, np.uint8)
-    frame = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
-
-    try:
-        faces = DeepFace.extract_faces(frame, detector_backend='ssd', enforce_detection=False)
-        if not faces:
-            return jsonify({'verified': False, 'message': 'No face detected'}), 200
-
-        verified, distance = verified_image(frame, name)
-        return jsonify({'verified': verified, 'distance': distance}), 200
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+@app.route('/verify_realtime_stream')
+def verify_realtime():
+    username = request.args.get('username')
+    return Response(generate_frames(username), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='127.0.0.1', port=80)
