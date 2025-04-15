@@ -1,0 +1,106 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Face Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+    }
+
+    .form-container, .video-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 45%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    img, canvas {
+      border-radius: 10px;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Form -->
+    <div class="form-container">
+      <h1>Realtime Face Verification </h1>
+      <input type="text" id="username" placeholder="Enter your name" required>
+      <br>
+      <button onclick="startCapturing()">Verify</button>
+      <p id="result"></p>
+    </div>
+
+    <!-- Webcam Feed -->
+    <div class="video-container">
+      <h2>Webcam</h2>
+      <img id="videoFeed" src="" alt="Video stream will appear here">
+      <div id="status"></div>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <script>
+      function startCapturing() {
+        const username = document.getElementById('username').value.trim();
+        const result = document.getElementById('result');
+        const status = document.getElementById('status');
+        const videoFeed = document.getElementById('videoFeed');
+    
+        if (!username) {
+          result.textContent = "Please enter your name.";
+          result.style.color = "red";
+          return;
+        }
+    
+        result.textContent = "Starting verification...";
+        result.style.color = "black";
+    
+        // Start MJPEG stream from Flask
+        videoFeed.src = `/verify_realtime_stream?username=${encodeURIComponent(username)}`;       // ✅ Corrected the URL to include username;
+        status.textContent = `Verifying ${username}...`;
+      }
+    </script>
+</body>
+</html>
