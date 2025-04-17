@@ -1,0 +1,143 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Face Verification</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .wrapper {
+      display: flex;
+      justify-content: space-between;
+      width: 80%;
+    }
+
+    .form-container, .video-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      width: 45%;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px 5px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    img, canvas {
+      border-radius: 10px;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+
+    #result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <!-- Form -->
+    <div class="form-container">
+      <h1>User Find identity </h1>
+      <button id='startButton'>Start</button>
+      <p id="result"></p>
+    </div>
+
+    <!-- Webcam Feed -->
+    <div class="video-container">
+      <h2>Webcam</h2>
+      <img id="videoFeed" src="" alt="Video stream will appear here">
+      <div id="status"></div>
+      <canvas id="canvas" style="display:none;"></canvas>
+    </div>
+  </div>
+
+  <script>
+    const status = document.getElementById('status');
+    const videoFeed = document.getElementById('videoFeed');
+    const result = document.getElementById('result');
+    const startButton = document.getElementById('startButton');
+    let webcamActive = false; // Track if webcam is currently active
+
+    function startCapturing() {
+        if (!webcamActive) {
+            result.textContent = "Starting finding...";
+            result.style.color = "black";
+            videoFeed.src = `/find_user_stream`;
+            webcamActive = true;
+            status.textContent = "Webcam is active.";
+            status.style.color = "green";
+            startButton.textContent = "Stop Webcam (Press Q)";
+        }
+    }
+
+    function stopCapturing() {
+        if (webcamActive) {
+            fetch('/quit_webcam', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    result.textContent = "";
+                    status.textContent = "Webcam stopped.";
+                    status.style.color = "orange";
+                    videoFeed.src = ''; // Stop loading the stream
+                    webcamActive = false;
+                    startButton.textContent = "Start Webcam";
+                } else {
+                    result.textContent = "";
+                    status.textContent = "Error stopping webcam.";
+                    status.style.color = "red";
+                    console.error('Failed to stop webcam:', response.status);
+                }
+            })
+            .catch(error => {
+                status.textContent = "Error communicating with backend.";
+                status.style.color = "red";
+                console.error('Error sending quit request:', error);
+            });
+        }
+    }
+
+    // Event listener for the 'Start Webcam' button
+    startButton.addEventListener('click', startCapturing);
+
+    // Event listener for the 'Q' key press to stop
+    document.addEventListener('keydown', function(event) {
+        if (event.key.toLowerCase() === 'q') {
+            stopCapturing();
+        }
+    });
+
+    // Initial state: Webcam is inactive
+    videoFeed.src = '';
+    </script>
+</body>
+</html>

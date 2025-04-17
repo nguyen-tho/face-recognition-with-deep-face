@@ -10,6 +10,7 @@ import numpy as np
 from verify_user import verified_image
 from verify_user import update_pkl_file
 from verify_user import find_user
+
 import base64
 
 webcam_active = True
@@ -227,8 +228,6 @@ def find_identity():
                 frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
                 
         #cv2.imshow("Real-time Face Detection", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'): #press 'q' to exit
-            break
         # Encode the frame in JPEG format
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
@@ -263,5 +262,54 @@ def activate_webcam():
 @app.route('/find_users_realtime')
 def find_user_realtime_page():
     return render_template('find_realtime.html')
+
+def find_users_realtime():
+    data_path = './data'
+    cap = cv2.VideoCapture(0)
+    global webcam_active
+    while webcam_active:
+        ret, frame = cap.read()
+        faces = DeepFace.extract_faces(frame, detector_backend='ssd', enforce_detection=False)
+        verified_users = []  # A list to store verified users and their confidence scores
+        
+        for face in faces:
+            region = face["facial_area"]
+            x = region['x']
+            y = region['y']
+            w = region['w']
+            h = region['h']
+            confidence = face["confidence"]
+            
+            if confidence > 0.6:
+                verified_name = find_user(frame, data_path)
+                if verified_name:
+                    verified_users.append((verified_name, confidence))
+                else:
+                    verified_users.append(("UNVERIFIED", confidence))
+                
+                # Draw bounding boxes and text for each detected face
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0) if verified_name else (0,0,255), 2) 
+                text = (verified_name).upper() if verified_name else "UNVERIFIED"
+                frame = cv2.putText(frame, text, (x, y - 4), font, 1, (0, 255, 0) if verified_name else (0, 0, 255), 1, cv2.LINE_AA)
+        
+        # Display the frame with bounding boxes and text
+        #cv2.imshow("Real-time Face Detection", frame)
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+        # Yield the frame to be used in the HTTP response
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    # Release the camera
+    cap.release()
+   
+
+
+@app.route('/find_users_realtime_stream')
+def find_user_realtime_stream():
+    global webcam_active
+    webcam_active = activate_webcam()
+    # Check if the webcam is active
+    return Response(find_users_realtime(), mimetype='multipart/x-mixed-replace; boundary=frame')
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=80)
