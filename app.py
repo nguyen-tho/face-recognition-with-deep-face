@@ -8,8 +8,11 @@ from create_dataset import get_random_jpg_file
 from PIL import Image
 import numpy as np
 from verify_user import verified_image
+from verify_user import update_pkl_file
+from verify_user import find_user
 import base64
 
+webcam_active = True
 
 @app.route('/')
 def index():
@@ -67,6 +70,9 @@ def capture_data(name):
         if key == ord("q") or key == 27 or num_of_images >= 100: #take 100 frames
             break
     cap.release()
+    
+    #update the pkl file for new user
+    update_pkl_file(name)
 
 
 @app.route('/features')
@@ -133,9 +139,7 @@ def verify_image():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-
-def generate_frames(username):
+def generate_frames_verify(username):
     cap = cv2.VideoCapture(0)  # Start capturing from webcam
     while True:
         success, frame = cap.read()
@@ -175,6 +179,7 @@ def generate_frames(username):
                     b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
     cap.release()
+    
 @app.route('/verify_realtime')
 def verify_realtime_page():
     return render_template('verify_realtime.html')
@@ -182,8 +187,81 @@ def verify_realtime_page():
 @app.route('/verify_realtime_stream')
 def verify_realtime():
     username = request.args.get('username')
-    return Response(generate_frames(username), mimetype='multipart/x-mixed-replace; boundary=frame')
+    return Response(generate_frames_verify(username), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/find_user')
+def find_user_page():
+    return render_template('find.html')
 
 
+def find_identity():
+    """find user in database"""
+    data_path = './data'
+    cap = cv2.VideoCapture(0)
+    global webcam_active
+    while webcam_active:
+        # Capture frame-by-frame
+        ret, frame = cap.read()
+        faces = DeepFace.extract_faces(frame, detector_backend='ssd',
+                                        enforce_detection=False)
+        region = faces[0]["facial_area"]
+    #print(region)
+        x = region['x']
+        y = region['y']
+        w = region['w']
+        h = region['h']
+        
+        confidence = faces[0]["confidence"]
+        
+        if confidence > 0.60:
+            verified_name = find_user(frame, data_path,'Facenet512')
+            if verified_name[0] != "":
+                text = ('FOUND: '+verified_name[0] + f'  {confidence*100:.4f}%').upper()
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 255, 0), 1, cv2.LINE_AA)
+            else: 
+                text = "NOT FOUND IDENTITY"
+                font = cv2.FONT_HERSHEY_PLAIN
+                frame = cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                frame = cv2.putText(frame, text, (x, y-4), font, 1, (0, 0, 255), 1, cv2.LINE_AA)
+                
+        #cv2.imshow("Real-time Face Detection", frame)
+        if cv2.waitKey(1) & 0xFF == ord('q'): #press 'q' to exit
+            break
+        # Encode the frame in JPEG format
+        ret, buffer = cv2.imencode('.jpg', frame)
+        frame = buffer.tobytes()
+        # Yield the frame to be used in the HTTP response
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    # Clean up
+# Release the camera
+    cap.release()
+    
+@app.route('/find_user_stream')
+def find_user_stream():
+    global webcam_active
+    webcam_active = activate_webcam()
+    # Check if the webcam is active
+    return Response(find_identity(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/quit_webcam', methods=['POST'])
+def quit_webcam():
+    global webcam_active
+    webcam_active = False
+    print("Received request to stop webcam.")
+    return '', 200
+
+
+def activate_webcam():
+    global webcam_active
+    webcam_active = True
+    print("Webcam activated.")
+    return activate_webcam
+
+@app.route('/find_users_realtime')
+def find_user_realtime_page():
+    return render_template('find_realtime.html')
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=80)
