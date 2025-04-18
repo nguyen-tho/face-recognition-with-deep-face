@@ -95,8 +95,16 @@ Find identity of a person
 
    ![find_identity](https://github.com/nguyen-tho/simple-attendance-system/blob/master/img_src/find_identity.png)
   
-9. Contact:
+#9. Contact:
 
-    Please contact with me at this email address to discuss: nguyencongtho116@gmail.com  
-   
+    Please contact with me at this email address to discuss: nguyencongtho116@gmail.com
+
+#10. New update
+   - Create API with Flask
+   - How to run API
+     ```sh
+     python app.py
+     # app.py is API code
+     # default server is localhost with port 80/127.0.0.1:80 (http port)
+     ```
    
