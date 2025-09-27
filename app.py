@@ -5,8 +5,6 @@ from deepface import DeepFace
 import os
 app = Flask(__name__)
 from create_dataset import get_random_jpg_file
-from PIL import Image
-import numpy as np
 from verify_user import verified_image
 from verify_user import update_pkl_file
 from verify_user import find_user
@@ -311,5 +309,6 @@ def find_user_realtime_stream():
     webcam_active = activate_webcam()
     # Check if the webcam is active
     return Response(find_users_realtime(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 if __name__ == '__main__':
     app.run(debug=True, host='127.0.0.1', port=80)
