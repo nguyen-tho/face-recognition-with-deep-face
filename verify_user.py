@@ -237,7 +237,7 @@ def update_pkl_file(name):
         print(f"Error deleting file '{pkl_file}': {e}")
     verified_name = find_user(image, data_path,model_name)
     if verified_name[0] != "":
-         messagebox.showinfo('Complete','Your data has been added to database')
+        print("Your identity has been updated") 
 
 #find_identity()  #find identity of user by a realtime video
 #check_attendance('tho') verify a user based on an image captured by webcam
