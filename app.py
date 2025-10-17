@@ -140,7 +140,9 @@ def verify_image():
 
 def generate_frames_verify(username):
     cap = cv2.VideoCapture(0)  # Start capturing from webcam
-    while True:
+    global webcam_active # Control variable to manage webcam state
+    
+    while webcam_active:
         success, frame = cap.read()
         if not success:
             break
@@ -185,6 +187,8 @@ def verify_realtime_page():
 
 @app.route('/verify_realtime_stream')
 def verify_realtime():
+    global webcam_active
+    webcam_active = activate_webcam()
     username = request.args.get('username')
     return Response(generate_frames_verify(username), mimetype='multipart/x-mixed-replace; boundary=frame')
 
