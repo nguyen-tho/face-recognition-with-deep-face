@@ -72,7 +72,7 @@
       <h1>Realtime Face Verification </h1>
       <input type="text" id="username" placeholder="Enter your name" required>
       <br>
-      <button onclick="startCapturing()">Verify</button>
+      <button id="startButton">Verify</button>
       <p id="result"></p>
     </div>
 
@@ -86,6 +86,7 @@
   </div>
 
   <script>
+    /*
       function startCapturing() {
         const username = document.getElementById('username').value.trim();
         const result = document.getElementById('result');
@@ -105,6 +106,76 @@
         videoFeed.src = `/verify_realtime_stream?username=${encodeURIComponent(username)}`;       // ✅ Corrected the URL to include username;
         status.textContent = `Verifying ${username}...`;
       }
+*/
+      const username = document.getElementById('username')
+      const result = document.getElementById('result');
+      const status = document.getElementById('status');
+      const videoFeed = document.getElementById('videoFeed');
+      const startButton = document.getElementById('startButton');
+      let webcamActive = false; // Track if webcam is currently active
+
+      function startCapturing() {
+        const username = document.getElementById('username').value.trim();
+
+        if (!username) {
+          result.textContent = "Please enter your name.";
+          result.style.color = "red";
+          return;
+        }
+        else{
+          if (!webcamActive) {
+              result.textContent = "Starting verification...";
+              result.style.color = "black";
+              videoFeed.src = `/verify_realtime_stream?username=${encodeURIComponent(username)}`;       
+              webcamActive = true;
+              status.textContent = `Verifying ${username}...`;
+              status.style.color = "green";
+              startButton.textContent = "Stop Verification (Press Q)";
+          }
+        }  
+    }
+
+      function stopCapturing() {
+        if (webcamActive) {
+            fetch('/quit_webcam', {
+                method: 'POST'
+            })
+            .then(response => {
+                if (response.ok) {
+                    result.textContent = "";
+                    status.textContent = "Webcam stopped.";
+                    status.style.color = "orange";
+                    videoFeed.src = ''; // Stop loading the stream
+                    webcamActive = false;
+                    startButton.textContent = "Verify";
+                } else {
+                    result.textContent = "";
+                    status.textContent = "Error stopping webcam.";
+                    status.style.color = "red";
+                    console.error('Failed to stop webcam:', response.status);
+                }
+            })
+            .catch(error => {
+                status.textContent = "Error communicating with backend.";
+                status.style.color = "red";
+                console.error('Error sending quit request:', error);
+            });
+        }
+    }
+
+    // Event listener for the 'Start Webcam' button
+    startButton.addEventListener('click', startCapturing);
+
+    // Event listener for the 'Q' key press to stop
+    document.addEventListener('keydown', function(event) {
+        if (event.key.toLowerCase() === 'q') {
+            stopCapturing();
+        }
+    });
+
+    // Initial state: Webcam is inactive
+    //username = "";
+    videoFeed.src = '';
     </script>
 </body>
 </html>
